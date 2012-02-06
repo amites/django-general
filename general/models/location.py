@@ -11,6 +11,7 @@ class ZipCode(models.Model):
     latitude = models.CharField(max_length=30)
     longitude = models.CharField(max_length=30)
     city = models.CharField(max_length=150, blank=True)
+    full_state = models.CharField(max_length=150, blank=True)
 
     class Meta:
         db_table = u'zip_codes'
