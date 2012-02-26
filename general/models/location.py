@@ -6,11 +6,6 @@ from general.geo_helpers import get_lat_lng
 from general.models.choices_location import COUNTRY_CHOICES
 
 class AddressStreet(models.Model):
-    #DefaultModel
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
-
     street = models.CharField(max_length=250, null=True, blank=True)
     city =  models.CharField(max_length=250, null=True, blank=True)
     state = models.CharField(max_length=2, null=True, blank=True, choices=US_STATES)
@@ -28,7 +23,7 @@ class AddressStreet(models.Model):
 class AddressExtended(AddressStreet):
     latitude = models.CharField(max_length=50, null=True, blank=True, verbose_name='Latitude')
     longitude = models.CharField(max_length=50, null=True, blank=True, verbose_name='Longitude')
-    geolocation = models.CharField(max_length=100, blank=True)
+    geolocation = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         abstract = True
