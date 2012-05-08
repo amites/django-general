@@ -2,7 +2,7 @@ from django.contrib.localflavor.us.models import PhoneNumberField
 from django.db import models
 
 #from general.models import DefaultModel
-from general.models.choices_privacy import PRIVACY_LEVEL
+from general.models.privacy import Privacy
 
 PHONE_TYPES = (
     ('mobile', 'Mobile'),
@@ -22,14 +22,18 @@ class Contact(models.Model):
 class Phone(models.Model):
     number = PhoneNumberField(null=True, blank=True)
     type = models.CharField(max_length=10, choices=PHONE_TYPES, default='home', null=True, blank=True)
-    privacy = models.IntegerField(max_length=5, choices=PRIVACY_LEVEL, default=20, blank=True, null=True)
 
     class Meta:
         abstract = True
 
 class Email(models.Model):
-    address = models.EmailField(max_length=250, null=True, blank=True)
-    privacy = models.IntegerField(max_length=5, choices=PRIVACY_LEVEL, default=30, blank=True, null=True)
+    email = models.EmailField(max_length=250, null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+class WebSite(models.Model):
+    website = models.CharField(max_length=250, null=True, blank=True)
 
     class Meta:
         abstract = True

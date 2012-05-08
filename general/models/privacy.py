@@ -1,3 +1,4 @@
+from django.db import models
 #ACL type approach
 # 0  = anonymous
 # 10 = high privacy
@@ -17,3 +18,9 @@ PRIVACY_LEVEL_SIMPLE = (
     (0, 'Hidden'),
     (40, 'Public'),
 )
+
+class Privacy(models.Model):
+    privacy = models.IntegerField(max_length=5, choices=PRIVACY_LEVEL, default=20, blank=True, null=True)
+
+    class Meta:
+        abstract = True
