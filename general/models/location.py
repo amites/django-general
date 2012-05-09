@@ -5,14 +5,16 @@ from general.geo_helpers import get_lat_lng
 #from general.models import DefaultModel
 from general.models.choices_location import COUNTRY_CHOICES
 
+
 try:
     from geopy import geocoders
 except ImportError:
     geocoders = False
 
+
 class AddressStreet(models.Model):
     street = models.CharField(max_length=250, null=True, blank=True)
-    city =  models.CharField(max_length=250, null=True, blank=True)
+    city = models.CharField(max_length=250, null=True, blank=True)
     state = models.CharField(max_length=2, null=True, blank=True,
                         choices=US_STATES)
     #    province = models.CharField(max_length=120, null=True, blank=True,
@@ -30,6 +32,7 @@ class AddressStreet(models.Model):
         return "%s\n%s, %s %s" % (self.street, self.city, self.state,
                                     self.postal_code)
 
+
 class AddressGeoLocation(AddressStreet):
     latitude = models.CharField(max_length=50, null=True, blank=True,
                         verbose_name='Latitude')
@@ -46,7 +49,8 @@ class AddressGeoLocation(AddressStreet):
                                        self.country, self.postal_code)
     full_address = property(_get_full_address)
 
-    ## Geocode by just using zipcode and country name (faster and more reliable)
+    ## Geocode by just using zipcode and country name
+    #    (faster and more reliable)
     def _get_geo_address(self):
         return u'%s %s' % (self.country.name, self.zipcode)
     geo_address = property(_get_geo_address)
@@ -90,7 +94,7 @@ class AddressGeoLocation(AddressStreet):
 #                location = self.geo_address
 #                self.latlng = get_lat_lng(location)
 #            else:
-            location = '+'.join(filter(None, (self.street, self.city, self.state, self.country)))
+            location = '+'.join(filter(None, \
+                (self.street, self.city, self.state, self.country)))
             self.latlng = get_lat_lng(location)
         super(AddressGeoLocation, self).save(*args, **kwargs)
-

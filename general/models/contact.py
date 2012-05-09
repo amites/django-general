@@ -19,18 +19,22 @@ class Contact(models.Model):
     class Meta:
             abstract = True
 
+
 class Phone(models.Model):
     number = PhoneNumberField(null=True, blank=True)
-    type = models.CharField(max_length=10, choices=PHONE_TYPES, default='home', null=True, blank=True)
+    type = models.CharField(max_length=10, choices=PHONE_TYPES, \
+                                default='home', null=True, blank=True)
 
     class Meta:
         abstract = True
+
 
 class Email(models.Model):
     email = models.EmailField(max_length=250, null=True, blank=True)
 
     class Meta:
         abstract = True
+
 
 class WebSite(models.Model):
     website = models.CharField(max_length=250, null=True, blank=True)

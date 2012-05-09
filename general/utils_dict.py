@@ -1,6 +1,7 @@
 from xml.dom.minidom import Document
 import copy
 
+
 class dict2xml(object):
     doc = Document()
 
@@ -39,4 +40,4 @@ def clearEmpties(d):
     '''
     Removes empty values from a dict.
     '''
-    return dict( [(k,v) for k,v in d.items() if v and len(v)>0])
+    return dict([(k, v) for k, v in d.items() if v and len(v) > 0])

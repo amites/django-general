@@ -1,6 +1,7 @@
 from django.forms import CharField
 from django.forms.models import BaseInlineFormSet
 
+
 class RequiredInlineFormSet(BaseInlineFormSet):
     """
     Generates an inline formset that is required
@@ -14,9 +15,11 @@ class RequiredInlineFormSet(BaseInlineFormSet):
         form.empty_permitted = False
         return form
 
+
 class CityStateZipField(CharField):
     def validate(self, value):
         super(CityStateZipField, self).validate(value)
         match = re.search(r"\d{5}|\w+, [\.\w]+(?:\w+)?", value)
         if not match:
-            raise exceptions.ValidationError(_('Please enter a 5 digit Zip Code or City, State'))
+            raise exceptions.ValidationError(_('Please enter a 5 digit '\
+                                            + 'Zip iCode or City, State'))

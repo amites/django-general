@@ -3,7 +3,9 @@ from django.utils.safestring import mark_safe
 from django.utils.html import conditional_escape
 from django.template import Library
 
+
 register = Library()
+
 
 @register.filter
 def cap(value):
@@ -20,7 +22,8 @@ def cap(value):
             sub = name.split('o\'')
             name = "O'" + sub[1].capitalize()
 
-        else: name = name.capitalize()
+        else:
+            name = name.capitalize()
 
         nlist = name.split('-')
         for n in nlist:
@@ -28,7 +31,7 @@ def cap(value):
                 up = n[0].upper()
                 old = "-%s" % (n[0],)
                 new = "-%s" % (up,)
-                name = name.replace(old,new)
+                name = name.replace(old, new)
 
         fixed = fixed + " " + name
     return fixed
@@ -38,17 +41,17 @@ def cap(value):
 def obfuscate(email, linktext=None, autoescape=None):
     """
     Given a string representing an email address,
-	returns a mailto link with rot13 JavaScript obfuscation.
+    returns a mailto link with rot13 JavaScript obfuscation.
 
     Accepts an optional argument to use as the link text;
-	otherwise uses the email address itself.
+    otherwise uses the email address itself.
     """
     if autoescape:
         esc = conditional_escape
     else:
         esc = lambda x: x
 
-    email = re.sub('@','\\\\100', re.sub('\.', '\\\\056',\
+    email = re.sub('@', '\\\\100', re.sub('\.', '\\\\056',\
                                          esc(email))).encode('rot13')
 
     if linktext:

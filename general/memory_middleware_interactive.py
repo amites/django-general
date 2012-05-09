@@ -14,7 +14,8 @@ from base64 import b64decode, b64encode
 import cPickle
 from cStringIO import StringIO
 from decimal import Decimal
-import hotshot, hotshot.stats
+import hotshot
+import hotshot.stats
 import pprint
 import sys
 import tempfile
@@ -24,6 +25,7 @@ from django.core.exceptions import MiddlewareNotUsed
 from django.db import connection, reset_queries
 from django.http import HttpResponse
 from django.utils import html
+
 
 class StdoutWrapper(object):
     """Simple wrapper to capture and overload sys.stdout"""
@@ -53,6 +55,7 @@ def render_stats(stats, sort, format):
     stats.sort_stats(*sort)
     getattr(stats, format)()
     return output.stream
+
 
 def render_queries(queries, sort):
     """
@@ -99,6 +102,7 @@ def pickle_stats(stats):
     if hasattr(stats, "stream"):
         del stats.stream
     return cPickle.dumps(stats)
+
 
 def unpickle_stats(stats):
     """Unpickle a pstats.Stats object"""
@@ -194,6 +198,7 @@ sort_categories = (('time', 'internal time'),
                    ('stdname', 'standard name'),
                    ('name', 'function name'))
 
+
 def display_stats(request, stats, queries):
     """
     Generate a HttpResponse of functions for a profiling run.
@@ -220,7 +225,7 @@ def display_stats(request, stats, queries):
                         {'format_buttons': format_buttons,
                          'sort_first_buttons': sort_first_buttons,
                          'sort_second_buttons': sort_second_buttons,
-                         'rawqueries' : b64encode(cPickle.dumps(queries)),
+                         'rawqueries': b64encode(cPickle.dumps(queries)),
                          'rawstats': b64encode(pickle_stats(stats)),
                          'stats': "".join(output),
                          'url': request.path})
@@ -272,7 +277,7 @@ def display_queries(request, stats, queries):
                         {'sort_buttons': sort_buttons,
                          'num_queries': len(queries),
                          'queries': "".join(output),
-                         'rawqueries' : b64encode(cPickle.dumps(queries)),
+                         'rawqueries': b64encode(cPickle.dumps(queries)),
                          'rawstats': b64encode(pickle_stats(stats)),
                          'url': request.path})
     return response
@@ -287,11 +292,11 @@ class ProfileMiddleware(object):
     """
     def process_request(self, request):
         """
-	Setup the profiler for a profiling run and clear the SQL query log.
+        Setup the profiler for a profiling run and clear the SQL query log.
 
-	If this is a resort of an existing profiling run, just return
-	the resorted list.
-	"""
+        If this is a resort of an existing profiling run, just return
+        the resorted list.
+        """
         def unpickle(params):
             stats = unpickle_stats(b64decode(params.get('stats', '')))
             queries = cPickle.loads(b64decode(params.get('queries', '')))
@@ -335,7 +340,6 @@ class ProfileMiddleware(object):
                                         request, *view_args, **view_kwargs)
             finally:
                 request.GET = original_get
-
 
     def process_response(self, request, response):
         """Finish profiling and render the results."""
