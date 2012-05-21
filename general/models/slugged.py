@@ -8,9 +8,8 @@ class Slugged(models.Model):
 
     def save(self, *args, **kwargs):
         if self.slug == '':
-            try:
-                name = self.slug_name
-            except AttributeError:
+            name = getattr(self, slug_name, False)
+            if not name:
                 try:
                     name = self.name
                 except AttributeError:

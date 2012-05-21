@@ -5,7 +5,6 @@ from general.geo_helpers import get_lat_lng
 #from general.models import DefaultModel
 from general.models.choices_location import COUNTRY_CHOICES
 
-
 try:
     from geopy import geocoders
 except ImportError:
@@ -45,7 +44,7 @@ class AddressGeoLocation(AddressStreet):
 
     ## Geocode using full address
     def _get_full_address(self):
-        return u'%s %s %s %s %s %s' % (self.street, self.city, self.state,
+        return u'%s, %s, %s, %s %s' % (self.street, self.city, self.state,
                                        self.country, self.postal_code)
     full_address = property(_get_full_address)
 
@@ -67,7 +66,7 @@ class AddressGeoLocation(AddressStreet):
             if self.postal_code:
                 address.append(str(self.postal_code))
 #            print address
-            if len(address) > 1:
+            if len(address) > 1 and geocoders:
                 g = geocoders.Google()
 #                print ', '.join(address)
                 location = g.geocode(', '.join(address), False)
@@ -85,8 +84,8 @@ class AddressGeoLocation(AddressStreet):
 #                print self.longitude
                 self.geolocation = '%s,%s' % (self.latitude, self.longitude)
                 self.save()
-                return True
-        return False
+                return self.geolocation
+        return self.geolocation
 
     def save(self, *args, **kwargs):
         if not self.geolocation:

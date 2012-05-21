@@ -1,8 +1,10 @@
 import re
+
+from django.db.models.base import ModelBase
 from django.template.defaultfilters import slugify
 
 
-def unique_slugify(instance, value, slug_field_name='slug', queryset=None,
+def unique_slugify(model, value, slug_field_name='slug', queryset=None,
                    slug_separator='-'):
     """
     Calculates and stores a unique slug of ``value`` for an instance.
@@ -13,9 +15,7 @@ def unique_slugify(instance, value, slug_field_name='slug', queryset=None,
     ``queryset`` usually doesn't need to be explicitly provided - it'll default
     to using the ``.all()`` queryset from the model's default manager.
     """
-    slug_field = instance._meta.get_field(slug_field_name)
-
-    slug = getattr(instance, slug_field.attname)
+    slug_field = model._meta.get_field(slug_field_name)
     slug_len = slug_field.max_length
 
     # Sort out the initial slug, limiting its length if necessary.
@@ -27,10 +27,13 @@ def unique_slugify(instance, value, slug_field_name='slug', queryset=None,
 
     # Create the queryset if one wasn't explicitly provided and exclude the
     # current instance from the queryset.
-    if queryset is None:
-        queryset = instance.__class__._default_manager.all()
-    if instance.pk:
-        queryset = queryset.exclude(pk=instance.pk)
+    if type(model) == ModelBase:
+        if queryset is None:
+            queryset = model.__class__._default_manager.all()
+        if instance.pk:
+            queryset = queryset.exclude(pk=instance.pk)
+    else:
+        queryset = model.objects
 
     # Find a unique slug. If one matches, at '-2' to the end and try again
     # (then '-3', etc).
@@ -44,7 +47,8 @@ def unique_slugify(instance, value, slug_field_name='slug', queryset=None,
         slug = '%s%s' % (slug, end)
         next += 1
 
-    setattr(instance, slug_field.attname, slug)
+#    setattr(instance, slug_field.attname, slug)
+    return slug
 
 
 def _slug_strip(value, separator='-'):
