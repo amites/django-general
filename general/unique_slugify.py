@@ -27,13 +27,13 @@ def unique_slugify(model, value, slug_field_name='slug', queryset=None,
 
     # Create the queryset if one wasn't explicitly provided and exclude the
     # current instance from the queryset.
-    if type(model) == ModelBase:
+    try:
+        queryset = model.objects
+    except AttributeError:
         if queryset is None:
             queryset = model.__class__._default_manager.all()
-        if instance.pk:
+        if model.pk:
             queryset = queryset.exclude(pk=instance.pk)
-    else:
-        queryset = model.objects
 
     # Find a unique slug. If one matches, at '-2' to the end and try again
     # (then '-3', etc).

@@ -8,7 +8,7 @@ class Slugged(models.Model):
 
     def save(self, *args, **kwargs):
         if self.slug == '':
-            name = getattr(self, slug_name, False)
+            name = getattr(self, 'slug_name', False)
             if not name:
                 try:
                     name = self.name

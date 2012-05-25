@@ -1,6 +1,6 @@
 import json
 import urllib
-import urllib
+import urllib2
 from django.utils.encoding import smart_str
 
 
