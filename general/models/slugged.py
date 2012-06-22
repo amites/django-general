@@ -4,7 +4,7 @@ from general.unique_slugify import unique_slugify
 
 
 class Slugged(models.Model):
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if self.slug == '':
