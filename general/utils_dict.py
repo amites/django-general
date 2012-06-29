@@ -39,4 +39,8 @@ def clearEmpties(d):
     '''
     Removes empty values from a dict.
     '''
-    return dict( [(k,v) for k,v in d.items() if v and len(v)>0])
+    try:
+        return dict( [(k,v) for k,v in d.items() if v and len(str(v))>0])
+    except TypeError:
+        print 'Failed to clearEmpties: for value: %s' % v
+

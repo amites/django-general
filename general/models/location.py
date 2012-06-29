@@ -1,5 +1,4 @@
-
-rt urllib2
+import urllib2
 
 from django.contrib.localflavor.us.us_states import US_STATES
 from django.db import models
