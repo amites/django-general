@@ -15,7 +15,7 @@ def unique_slugify(instance, value, slug_field_name='slug', queryset=None,
     """
     slug_field = instance._meta.get_field(slug_field_name)
 
-    slug = getattr(instance, slug_field.attname)
+#    slug = getattr(instance, slug_field.attname)
     slug_len = slug_field.max_length
 
     # Sort out the initial slug, limiting its length if necessary.
@@ -45,6 +45,7 @@ def unique_slugify(instance, value, slug_field_name='slug', queryset=None,
         next += 1
 
     setattr(instance, slug_field.attname, slug)
+    return slug
 
 
 def _slug_strip(value, separator='-'):
