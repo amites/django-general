@@ -2,16 +2,16 @@ from general.utils_dict import dict2xml
 
 if __name__ == '__main__':
     structure = {
-        'sibbling' : {
-            'grandPa' : {
-                'dad' : {
-                    'name' : 'foo',
-                    'childs' : {
-                        'child' :
+        'sibbling': {
+            'grandPa': {
+                'dad': {
+                    'name': 'foo',
+                    'childs': {
+                        'child':
                             ['me', 'bro', ],
                     },
                 },
-                'uncle' : 'bar',
+                'uncle': 'bar',
             },
         },
     }

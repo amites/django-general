@@ -16,4 +16,3 @@ class SimpleTest(TestCase):
         self.assertEqual(1 + 1, 2)
 
 #ABCDEFG
-

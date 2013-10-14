@@ -1,1 +1,7 @@
-Collection of snippets and pieces of code that I use frequently in different Django Projects.
+Collection of snippets and pieces of code that I use frequently in different 
+Django Projects.
+
+Currently unstable -- future versions will break up the geography functions from
+the rest, and involve branches with proper versioning. It's in the plan just not
+in place, was about to delete the repo after not using for a few months but came
+back found it's place in my boilerplate again.

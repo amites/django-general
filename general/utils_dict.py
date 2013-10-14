@@ -1,6 +1,7 @@
 from xml.dom.minidom import Document
 import copy
 
+
 class dict2xml(object):
     doc = Document()
 

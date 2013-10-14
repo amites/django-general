@@ -1,5 +1,9 @@
 from django import template
+<<<<<<< HEAD
 from django.utils.html import escapejs
+=======
+
+>>>>>>> master
 
 register = template.Library()
 
