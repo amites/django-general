@@ -69,18 +69,17 @@ class AddressGeoLocation(AddressStreet):
                 address.append(str(self.postal_code))
 #            print address
             if len(address) > 1 and geocoders:
-                g = geocoders.Google()
+                g = geocoders.GoogleV3()
 #                print ', '.join(address)
-                location = g.geocode(', '.join(address), False)
+                place, (lat, lng) = g.geocode(', '.join(address), False)
     #            print location
                 try:
-                    self.latitude = location[0][1][0]
-                    self.longitude = location[0][1][1]
+                    self.latitude = lat
+                    self.longitude = lng
                 except IndexError:
 #                    self.latitude = latlon[0]
 #                    self.longitude = latlon[1]
-                    print location
-                    raise Exception('Something is wrong jim.')
+                    raise Exception('Unable to pull geocode')
     #            print latlon
 #                print self.latitude
 #                print self.longitude
