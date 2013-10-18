@@ -7,10 +7,7 @@ from general.geo_helpers import get_lat_lng
 #from general.models import DefaultModel
 from general.models.choices_location import COUNTRY_CHOICES
 
-<<<<<<< HEAD
-=======
 
->>>>>>> master
 try:
     from geopy import geocoders
 except ImportError:
@@ -50,11 +47,7 @@ class AddressGeoLocation(AddressStreet):
 
     ## Geocode using full address
     def _get_full_address(self):
-<<<<<<< HEAD
         return u'%s, %s, %s, %s %s' % (self.street, self.city, self.state,
-=======
-        return u'%s %s %s %s %s %s' % (self.street, self.city, self.state,
->>>>>>> master
                                        self.country, self.postal_code)
     full_address = property(_get_full_address)
 
