@@ -10,13 +10,13 @@ def get_lat_lng(location):
     """
 
     location = urllib.quote_plus(smart_str(location))
-    url = 'http://maps.googleapis.com/maps/api/geocode/'\
-                + 'json?address=%s&sensor=false' % location
+    url = 'http://maps.googleapis.com/maps/api/geocode/json?' \
+        + 'address={}&sensor=false'.format(location)
     response = urllib2.urlopen(url).read()
     result = json.loads(response)
     if result['status'] == 'OK':
         lat = str(result['results'][0]['geometry']['location']['lat'])
         lng = str(result['results'][0]['geometry']['location']['lng'])
-        return '%s,%s' % (lat, lng)
+        return '{},{}'.format(lat, lng)
     else:
         return ''

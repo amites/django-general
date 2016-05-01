@@ -13,8 +13,9 @@ class Slugged(models.Model):
                 try:
                     name = self.name
                 except AttributeError:
-                    raise Exception(str('Model %s must have field `name`'
-                        'or define `slug_name`' % self._meta.object_name))
+                    raise Exception(
+                        str('Model {} must have field `name` or define '
+                            '`slug_name`'.format(self._meta.object_name)))
             self.slug = unique_slugify(self, name)
         super(Slugged, self).save(*args, **kwargs)
 

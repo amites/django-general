@@ -10,18 +10,15 @@
 # To use it, pass 'profile=1' as a GET or POST parameter to any HTTP
 # request.
 
-from base64 import b64decode, b64encode
 import cPickle
+import sys
+from base64 import b64decode, b64encode
 from cStringIO import StringIO
 from decimal import Decimal
-import hotshot
-import hotshot.stats
-import pprint
-import sys
-import tempfile
+from hotshot import Profile, stats as hotshot_stats
+from tempfile import NamedTemporaryFile
 
 from django.conf import settings
-from django.core.exceptions import MiddlewareNotUsed
 from django.db import connection, reset_queries
 from django.http import HttpResponse
 from django.utils import html
@@ -42,7 +39,7 @@ class StdoutWrapper(object):
         return self.stream.getvalue()
 
 
-def render_stats(stats, sort, format):
+def render_stats(stats, sort, str_format):
     """
     Returns a StringIO containing the formatted statistics from _statsfile_.
 
@@ -53,7 +50,7 @@ def render_stats(stats, sort, format):
     if hasattr(stats, "stream"):
         stats.stream = output.stream
     stats.sort_stats(*sort)
-    getattr(stats, format)()
+    getattr(stats, str_format)()
     return output.stream
 
 
@@ -208,16 +205,16 @@ def display_stats(request, stats, queries):
     """
     sort = [request.REQUEST.get('sort_first', 'time'),
             request.REQUEST.get('sort_second', 'calls')]
-    format = request.REQUEST.get('format', 'print_stats')
+    obj_format = request.REQUEST.get('format', 'print_stats')
     sort_first_buttons = RadioButtons('sort_first', sort[0],
                                       sort_categories)
     sort_second_buttons = RadioButtons('sort_second', sort[1],
                                        sort_categories)
-    format_buttons = RadioButtons('format', format,
+    format_buttons = RadioButtons('format', obj_format,
                                   (('print_stats', 'by function'),
                                    ('print_callers', 'by callers'),
                                    ('print_callees', 'by callees')))
-    output = render_stats(stats, sort, format)
+    output = render_stats(stats, sort, obj_format)
     output.reset()
     output = [html.escape(unicode(line)) for line in output.readlines()]
     response = HttpResponse(mimetype='text/html; charset=utf-8')
@@ -290,42 +287,46 @@ class ProfileMiddleware(object):
 
     WARNING: It uses hotshot profiler which is not thread safe.
     """
-    def process_request(self, request):
+    @staticmethod
+    def process_request(request):
         """
         Setup the profiler for a profiling run and clear the SQL query log.
 
         If this is a resort of an existing profiling run, just return
         the resorted list.
         """
-        def unpickle(params):
-            stats = unpickle_stats(b64decode(params.get('stats', '')))
-            queries = cPickle.loads(b64decode(params.get('queries', '')))
-            return stats, queries
+        def unpickle(obj_params):
+            obj_stats = unpickle_stats(b64decode(obj_params.get('stats', '')))
+            obj_queries = cPickle.loads(b64decode(obj_params.get('queries',
+                                                                 '')))
+            return obj_stats, obj_queries
 
         if request.method != 'GET' and \
-           not (request.META.get('HTTP_CONTENT_TYPE',
-                                 request.META.get('CONTENT_TYPE', '')) in
-                ['multipart/form-data', 'application/x-www-form-urlencoded']):
+                not (request.META.get('HTTP_CONTENT_TYPE',
+                                      request.META.get('CONTENT_TYPE', '')) in
+                     ['multipart/form-data',
+                      'application/x-www-form-urlencoded']):
             return
         if (request.REQUEST.get('profile', False) and
-            (settings.DEBUG == True or request.user.is_staff)):
-            request.statsfile = tempfile.NamedTemporaryFile()
+                (settings.DEBUG is True or request.user.is_staff)):
+            request.statsfile = NamedTemporaryFile()
             params = request.REQUEST
-            if (params.get('show_stats', False)
-                and params.get('show_queries', '1') == '1'):
+            if params.get('show_stats', False) and \
+                    params.get('show_queries', '1') == '1':
                 # Instantly re-sort the existing stats data
                 stats, queries = unpickle(params)
                 return display_stats(request, stats, queries)
-            elif (params.get('show_queries', False)
-                  and params.get('show_stats', '1') == '1'):
+            elif params.get('show_queries', False) and \
+                    params.get('show_stats', '1') == '1':
                 stats, queries = unpickle(params)
                 return display_queries(request, stats, queries)
             else:
                 # We don't have previous data, so initialize the profiler
-                request.profiler = hotshot.Profile(request.statsfile.name)
+                request.profiler = Profile(request.statsfile.name)
                 reset_queries()
 
-    def process_view(self, request, view_func, view_args, view_kwargs):
+    @staticmethod
+    def process_view(request, view_func, view_args, view_kwargs):
         """Run the profiler on _view_func_."""
         profiler = getattr(request, 'profiler', None)
         if profiler:
@@ -341,16 +342,17 @@ class ProfileMiddleware(object):
             finally:
                 request.GET = original_get
 
-    def process_response(self, request, response):
+    @staticmethod
+    def process_response(request, response):
         """Finish profiling and render the results."""
         profiler = getattr(request, 'profiler', None)
         if profiler:
             profiler.close()
             params = request.REQUEST
-            stats = hotshot.stats.load(request.statsfile.name)
+            stats = hotshot_stats.load(request.statsfile.name)
             queries = connection.queries
-            if (params.get('show_queries', False)
-                and params.get('show_stats', '1') == '1'):
+            if params.get('show_queries', False) and \
+                    params.get('show_stats', '1') == '1':
                 response = display_queries(request, stats, queries)
             else:
                 response = display_stats(request, stats, queries)

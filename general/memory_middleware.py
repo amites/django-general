@@ -1,6 +1,4 @@
-from pympler import muppy
-from pympler import summary
-#from pympler import refbrowser
+from pympler import muppy, summary
 from pympler.asizeof import asizeof
 
 

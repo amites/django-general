@@ -1,8 +1,8 @@
 from django.contrib.localflavor.us.models import PhoneNumberField
 from django.db import models
 
-#from general.models import DefaultModel
 from general.models.privacy import Privacy
+
 
 PHONE_TYPES = (
     ('mobile', 'Mobile'),
@@ -22,8 +22,8 @@ class Contact(models.Model):
 
 class Phone(models.Model):
     number = PhoneNumberField(null=True, blank=True)
-    type = models.CharField(max_length=10, choices=PHONE_TYPES, \
-                                default='home', null=True, blank=True)
+    type = models.CharField(max_length=10, choices=PHONE_TYPES,
+                            default='home', null=True, blank=True)
 
     class Meta:
         abstract = True

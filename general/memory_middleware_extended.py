@@ -3,12 +3,11 @@
 # Modified by: Shwagroo Team
 
 import sys
-import os
 import re
-import hotshot
-import hotshot.stats
-import tempfile
 import StringIO
+from hotshot import Profile, stats
+from tempfile import mktemp
+from os import unlink
 
 from django.conf import settings
 
@@ -35,34 +34,39 @@ class ProfileMiddleware(object):
 
     WARNING: It uses hotshot profiler which is not thread safe.
     """
+    def __init__(self):
+        self.tmpfile = None
+        self.prof = None
+
     def process_request(self, request):
         if (settings.DEBUG or request.user.is_superuser) \
                 and request.method == 'GET' and request.GET.get('prof', False):
-            self.tmpfile = tempfile.mktemp()
-            self.prof = hotshot.Profile(self.tmpfile)
+            self.tmpfile = mktemp()
+            self.prof = Profile(self.tmpfile)
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
         if (settings.DEBUG or request.user.is_superuser) \
                 and request.method == 'GET' and request.GET.get('prof', False):
-            return self.prof.runcall(callback, request, *callback_args, \
-                                        **callback_kwargs)
+            return self.prof.runcall(callback, request, *callback_args,
+                                     **callback_kwargs)
 
-    def get_group(self, file):
+    @staticmethod
+    def get_group(f):
         for g in group_prefix_re:
-            name = g.findall(file)
+            name = g.findall(f)
             if name:
                 return name[0]
 
-    def get_summary(self, results_dict, sum):
-        list = [(item[1], item[0]) for item in results_dict.items()]
-        list.sort(reverse=True)
-        list = list[:40]
+    @staticmethod
+    def get_summary(results_dict, sum_obj):
+        group = [(item[1], item[0]) for item in results_dict.items()]
+        group.sort(reverse=True)
+        group = list[:40]
 
         res = "      tottime\n"
-        for item in list:
+        for item in group:
             res += "%4.1f%% %7.3f %s\n" % \
-                    (100 * item[0] / sum if sum else 0, item[0], item[1])
-
+                   (100 * item[0] / sum_obj if sum_obj else 0, item[0], item[1])
         return res
 
     def summary_for_files(self, stats_str):
@@ -71,30 +75,28 @@ class ProfileMiddleware(object):
         mystats = {}
         mygroups = {}
 
-        sum = 0
+        sum_obj = 0
 
         for s in stats_str:
             fields = words_re.split(s)
             if len(fields) == 7:
                 time = float(fields[2])
-                sum += time
-                file = fields[6].split(":")[0]
+                sum_obj += time
+                file_name = fields[6].split(":")[0]
 
-                if not file in mystats:
-                    mystats[file] = 0
-                mystats[file] += time
+                if file_name not in mystats:
+                    mystats[file_name] = 0
+                mystats[file_name] += time
 
-                group = self.get_group(file)
-                if not group in mygroups:
+                group = self.get_group(file_name)
+                if group not in mygroups:
                     mygroups[group] = 0
                 mygroups[group] += time
 
-        return "<pre>" + \
-               " ---- By file ----\n\n" + \
-                    self.get_summary(mystats, sum) + "\n" + \
-               " ---- By group ---\n\n" + \
-                    self.get_summary(mygroups, sum) + \
-               "</pre>"
+        return '<pre> ---- By file ----\n\n{}\n ' \
+               '---- By group ---\n\n{}</pre>'.\
+            format(self.get_summary(mystats, sum_obj),
+                   self.get_summary(mygroups, sum_obj))
 
     def process_response(self, request, response):
         if (settings.DEBUG or request.user.is_superuser) \
@@ -105,9 +107,9 @@ class ProfileMiddleware(object):
             old_stdout = sys.stdout
             sys.stdout = out
 
-            stats = hotshot.stats.load(self.tmpfile)
-            stats.sort_stats('time', 'calls')
-            stats.print_stats()
+            obj_stats = stats.load(self.tmpfile)
+            obj_stats.sort_stats('time', 'calls')
+            obj_stats.print_stats()
 
             sys.stdout = old_stdout
             stats_str = out.getvalue()
@@ -119,6 +121,6 @@ class ProfileMiddleware(object):
 
             response.content += self.summary_for_files(stats_str)
 
-            os.unlink(self.tmpfile)
+            unlink(self.tmpfile)
 
         return response

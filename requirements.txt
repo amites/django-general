@@ -1,0 +1,2 @@
+pympler==0.4.3
+feedparser==5.2.1

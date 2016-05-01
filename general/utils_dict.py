@@ -1,5 +1,6 @@
+from copy import deepcopy
+
 from xml.dom.minidom import Document
-import copy
 
 
 class dict2xml(object):
@@ -17,6 +18,8 @@ class dict2xml(object):
 
     def build(self, father, structure):
         if type(structure) == dict:
+            tag = ''
+            k = ''
             for k in structure:
                 tag = self.doc.createElement(k)
             father.appendChild(tag)
@@ -24,11 +27,11 @@ class dict2xml(object):
 
         elif type(structure) == list:
             grandFather = father.parentNode
-            uncle = copy.deepcopy(father)
+            uncle = deepcopy(father)
             for l in structure:
                 self.build(father, l)
                 grandFather.appendChild(father)
-                father = copy.deepcopy(uncle)
+                father = deepcopy(uncle)
 
         else:
             data = str(structure)
@@ -37,10 +40,30 @@ class dict2xml(object):
 
 
 def clearEmpties(d):
-    '''
+    """
     Removes empty values from a dict.
-    '''
+    """
+    v = None
     try:
-        return dict( [(k,v) for k,v in d.items() if v and len(str(v))>0])
+        return dict([(k, v) for k, v in d.items() if v and len(str(v)) > 0])
     except TypeError:
-        print 'Failed to clearEmpties: for value: %s' % v
+        print 'Failed to clearEmpties: for value: {}'.format(v)
+
+
+if __name__ == '__main__':
+    struct = {
+        'sibbling': {
+            'grandPa': {
+                'dad': {
+                    'name': 'foo',
+                    'childs': {
+                        'child':
+                            ['me', 'bro', ],
+                    },
+                },
+                'uncle': 'bar',
+            },
+        },
+    }
+    xml = dict2xml(struct)
+    xml.display()

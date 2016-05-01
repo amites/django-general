@@ -1,7 +1,8 @@
 import re
-from django.utils.safestring import mark_safe
-from django.utils.html import conditional_escape
+
 from django.template import Library
+from django.utils.html import conditional_escape
+from django.utils.safestring import mark_safe
 
 
 register = Library()
@@ -51,17 +52,17 @@ def obfuscate(email, linktext=None, autoescape=None):
     else:
         esc = lambda x: x
 
-    email = re.sub('@', '\\\\100', re.sub('\.', '\\\\056',\
-                                         esc(email))).encode('rot13')
+    email = re.sub('@', '\\\\100',
+                   re.sub('\.', '\\\\056', esc(email))).encode('rot13')
 
     if linktext:
         linktext = esc(linktext).encode('rot13')
     else:
         linktext = email
 
-    rotten_link = """<script type="text/javascript">document.write \
-        ("<n uers=\\\"znvygb:%s\\\">%s<\\057n>".replace(/[a-zA-Z]/g, \
-        function(c){return String.fromCharCode((c<="Z"?90:122)>=\
-        (c=c.charCodeAt(0)+13)?c:c-26);}));</script>""" % (email, linktext)
+    rotten_link = '<script type="text/javascript">document.write ' + \
+        '("<n uers=\\\"znvygb:{}\\\">{}<\\057n>".replace(/[a-zA-Z]/g, ' + \
+        'function(c){return String.fromCharCode((c<="Z"?90:122)>=' + \
+        '(c=c.charCodeAt(0)+13)?c:c-26);}));</script>'.format(email, linktext)
     return mark_safe(rotten_link)
 obfuscate.needs_autoescape = True

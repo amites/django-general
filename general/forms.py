@@ -1,5 +1,9 @@
+import re
+
+from django.core.exceptions import ValidationError
 from django.forms import CharField
 from django.forms.models import BaseInlineFormSet
+from django.utils.translation import ugettext as _
 
 
 class RequiredInlineFormSet(BaseInlineFormSet):
@@ -21,5 +25,5 @@ class CityStateZipField(CharField):
         super(CityStateZipField, self).validate(value)
         match = re.search(r"\d{5}|\w+, [\.\w]+(?:\w+)?", value)
         if not match:
-            raise exceptions.ValidationError(_('Please enter a 5 digit '\
-                                            + 'Zip iCode or City, State'))
+            raise ValidationError(
+                _('Please enter a 5 digit Zip iCode or City, State'))

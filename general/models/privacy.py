@@ -24,7 +24,7 @@ PRIVACY_LEVEL_SIMPLE = (
 
 class Privacy(models.Model):
     privacy = models.IntegerField(max_length=5, choices=PRIVACY_LEVEL,
-                                    default=20, blank=True, null=True)
+                                  default=20, blank=True, null=True)
 
     class Meta:
         abstract = True

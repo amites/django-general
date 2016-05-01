@@ -22,7 +22,7 @@ class RssParserNode(template.Node):
         else:
             try:
                 context[self.var_name] = \
-                        feedparser.parse(context[self.url_var_name])
+                    feedparser.parse(context[self.url_var_name])
             except KeyError:
                 raise template.TemplateSyntaxError, \
                     "the variable \"%s\" can't be found in the context" % \
@@ -74,8 +74,8 @@ def get_rss(parser, token):
 
 @register.filter
 def rss_date(value, arg):
-    '''
+    """
     Return datetime obj from rss article
-    '''
-    return template.defaultfilters.date(\
-                            datetime.fromtimestamp(mktime(value)), arg)
+    """
+    return template.defaultfilters.date(
+        datetime.fromtimestamp(mktime(value)), arg)

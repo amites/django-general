@@ -61,7 +61,7 @@ STATE_CHOICES = (
 )
 
 US_STATES_LATLON = (
-#Geographic center of US
+    # Geographic center of US
     ('', '39.50,98.35'),
     ('AK', '61.3850,-152.2683'),
     ('AL', '32.7990,-86.8073'),
@@ -118,7 +118,7 @@ US_STATES_LATLON = (
     ('WI', '44.2563,-89.6385'),
     ('WV', '38.4680,-80.9696'),
     ('WY', '42.7475,-107.2085'),
-#Geographic center of US
+    # Geographic center of US
     ('XX', '39.50,98.35'),
 )
 
